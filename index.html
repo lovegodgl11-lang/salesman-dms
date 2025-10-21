@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en" class=""><head><script>window.livecodes = window.livecodes || {};</script><title>Untitled Project</title><meta name="title" content="Untitled Project"><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="stylesheet" href="./style.css"><script src="https://cdn.jsdelivr.net/npm/es-module-shims@1.10.0/dist/es-module-shims.js" async=""></script><script type="importmap">{
+  "imports": {}
+}</script></head><body>
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salesman Panel - Dump Money Solution</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <style>
+      :root {
+        --primary-color: #3b82f6; --primary-hover: #2563eb; --secondary-color: #eff6ff;
+        --text-color: #111827; --text-light: #6b7280; --border-color: #d1d5db;
+        --background-color: #f9fafb; --card-background: #ffffff; --danger-color: #ef4444;
+        --success-color: #22c55e; --warning-color: #f59e0b; --font-family: 'Inter', sans-serif;
+        --border-radius: 0.5rem; --box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: var(--font-family); background-color: var(--background-color); color: var(--text-color);
+        display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding: 2rem 1rem;
+      }
+      #root { width: 100%; max-width: 800px; }
+      .container { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; }
+      .page { display: none; width: 100%; }
+      .page.active { display: block; }
+      .auth-card {
+        background-color: var(--card-background); border-radius: var(--border-radius); box-shadow: var(--box-shadow);
+        padding: 2.5rem; width: 100%; max-width: 450px; border: 1px solid var(--border-color); margin: 0 auto;
+      }
+      .auth-card h1 { font-size: 1.75rem; font-weight: 700; text-align: center; margin-bottom: 0.5rem; }
+      .auth-card p { text-align: center; color: var(--text-light); margin-bottom: 2rem; }
+      .form-group { margin-bottom: 1.25rem; }
+      .form-group label { display: block; font-weight: 500; margin-bottom: 0.5rem; font-size: 0.875rem; }
+      .form-group input {
+        width: 100%; padding: 0.75rem 1rem; border-radius: var(--border-radius); border: 1px solid var(--border-color);
+        font-size: 1rem; font-family: var(--font-family); transition: border-color 0.2s, box-shadow 0.2s;
+      }
+      .form-group input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+      .btn {
+        width: 100%; padding: 0.875rem 1rem; border: none; border-radius: var(--border-radius); font-size: 1rem;
+        font-weight: 600; cursor: pointer; transition: background-color 0.2s; display: flex; justify-content: center; align-items: center; gap: 0.5rem;
+      }
+      .btn:disabled { background-color: #9ca3af; cursor: not-allowed; }
+      .btn-primary { background-color: var(--primary-color); color: white; }
+      .btn-primary:hover { background-color: var(--primary-hover); }
+      .btn-secondary { background-color: #f3f4f6; color: var(--text-color); border: 1px solid var(--border-color); }
+      .btn-secondary:hover { background-color: #e5e7eb; }
+
+      .dashboard-container { width: 100%; }
+      .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+      .dashboard-header h1 { font-size: 2.25rem; }
+      .btn-logout { padding: 0.5rem 1rem; background-color: #f3f4f6; color: var(--text-color); width: auto; border: 1px solid var(--border-color); }
+      .main-card {
+        background-color: var(--card-background); border-radius: var(--border-radius); box-shadow: var(--box-shadow);
+        padding: 2rem; width: 100%; border: 1px solid var(--border-color);
+      }
+      #transaction-details { display: none; text-align: left; margin-top: 2rem; }
+      .error-message { color: var(--danger-color); text-align: center; margin-bottom: 1rem; }
+      .role-selection { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+      .role-card { padding: 2rem; border: 2px solid var(--border-color); border-radius: var(--border-radius); text-align: center; cursor: pointer; transition: all 0.2s; }
+      .role-card:hover { border-color: var(--primary-color); background-color: var(--secondary-color); }
+      .role-card.active { border-color: var(--primary-color); background-color: var(--secondary-color); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+      .role-card h3 { font-size: 1.25rem; margin-top: 1rem; }
+      .role-card .icon { font-size: 2.5rem; }
+      .mode-content { display: none; }
+      .mode-content.active { display: block; }
+      #customer-search-results .result-item { padding: 0.75rem; border: 1px solid var(--border-color); border-radius: var(--border-radius); margin-bottom: 0.5rem; cursor: pointer; }
+      #customer-search-results .result-item:hover { background-color: var(--secondary-color); }
+      #assist-header { background-color: var(--secondary-color); padding: 1rem; border-radius: var(--border-radius); margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+      .cart-item { display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #eee; }
+      #cart-summary { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px solid var(--text-color); }
+      .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(17, 24, 39, 0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 1rem; }
+      .modal-overlay.active { display: flex; }
+      .modal-content { background-color: var(--card-background); border-radius: var(--border-radius); width: 100%; max-width: 500px; }
+      .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color); }
+      .modal-header h2 { font-size: 1.25rem; }
+      .btn-close { background: none; border: none; font-size: 2rem; cursor: pointer; color: var(--text-light); }
+      .modal-body { padding: 1.5rem; }
+
+      @media (max-width: 768px) {
+        body { padding: 1rem; }
+        .dashboard-header { flex-direction: column; align-items: flex-start; }
+        .auth-card, .main-card { padding: 1.5rem; }
+        .dashboard-header h1 { font-size: 1.75rem; }
+        .role-selection { grid-template-columns: 1fr; }
+      }
+    </style>
+
+
+<div id="root">
+    <div class="container">
+        <div id="loading-page" class="page active"><p>Loading...</p></div>
+        <!-- Auth Page -->
+        <div id="auth-page" class="page">
+            <div class="auth-card">
+                <h1 id="auth-title">Salesman Login</h1>
+                <p id="auth-subtitle">Please use the credentials provided by your admin.</p>
+                <form id="auth-form">
+                    <p id="auth-error" class="error-message" style="display: none;"></p>
+                    <div class="form-group"><label for="auth-email">Email</label><input type="email" id="auth-email" name="email" required=""></div>
+                    <div class="form-group"><label for="auth-password">Password</label><input type="password" id="auth-password" name="password" minlength="6" required=""></div>
+                    <button type="submit" id="auth-button" class="btn btn-primary" style="margin-top: 1rem;">Sign In</button>
+                </form>
+                <p style="text-align: center; margin-top: 1.5rem;">
+                    <span id="auth-toggle-text">First time here? </span>
+                    <span id="auth-toggle-link" style="color:var(--primary-color); cursor:pointer; font-weight:500;">Create Account</span>
+                </p>
+            </div>
+        </div>
+        
+        <!-- Salesman Dashboard Page -->
+        <div id="salesman-dashboard-page" class="page">
+            <div class="dashboard-container">
+                <div class="dashboard-header">
+                    <h1 id="salesman-welcome-header">Salesman Panel</h1>
+                    <button id="salesman-logout-button" class="btn btn-logout">Logout</button>
+                </div>
+                
+                <div class="role-selection">
+                    <div class="role-card active" id="role-verify"> <div class="icon">✅</div> <h3>Verify Order</h3> </div>
+                    <div class="role-card" id="role-assist"> <div class="icon">🧑‍🤝‍🧑</div> <h3>Assist Customer</h3> </div>
+                </div>
+
+                <div class="main-card">
+                    <div id="verify-mode" class="mode-content active">
+                        <h2>Verify Customer Order</h2>
+                        <p>Enter the Order ID from the customer to fetch details.</p>
+                        <form id="verify-order-form" style="max-width: 350px; margin: 0 auto;">
+                            <div class="form-group">
+                                <label for="txn-id-input" style="text-align: left;">Order ID</label>
+                                <input type="text" id="txn-id-input" placeholder="e.g., aKqR..." required="">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Fetch Order Details</button>
+                        </form>
+                        <div id="transaction-details"></div>
+                        <button id="reset-verify-button" class="btn" style="display: none; width: auto; padding: 0.5rem 1.5rem; margin: 1rem auto 0; background-color: var(--border-color);">Verify Another Order</button>
+                    </div>
+
+                    <div id="assist-mode" class="mode-content">
+                        <div id="customer-search-step">
+                            <h2>Assist a Customer</h2>
+                            <p>Search for a customer by email or mobile to start shopping.</p>
+                             <form id="customer-search-form" style="max-width: 400px; margin: 1.5rem auto;">
+                                <div class="form-group">
+                                    <input type="text" id="customer-search-input" placeholder="Enter customer email or mobile" required="">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Search Customer</button>
+                            </form>
+                            <div id="customer-search-results"></div>
+                        </div>
+                        <div id="shopping-step" style="display:none;">
+                           <div id="assist-header"></div>
+                           <button id="scan-product-btn" class="btn btn-primary" style="margin-bottom: 1.5rem;">📷 Scan Product</button>
+                           <div id="cart-container">
+                               <h4>Customer Cart</h4>
+                               <div id="cart-items"></div>
+                               <div id="cart-summary"></div>
+                           </div>
+                           <button id="end-assist-session" class="btn btn-secondary" style="margin-top: 2rem;">End Session</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="scan-modal" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Scan Product QR Code</h2>
+                    <button id="close-scan-modal" class="btn-close">×</button>
+                </div>
+                <div class="modal-body">
+                    <div id="qr-reader" style="width: 100%; border: 1px solid var(--border-color); border-radius: var(--border-radius);"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+    import { getFirestore, doc, getDoc, updateDoc, collection, query, where, getDocs, runTransaction, serverTimestamp, addDoc } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA2yF3_AdR-GFhkJudVQn5nMj2tjq7uRsA",
+      authDomain: "dump-money-cfd01.firebaseapp.com",
+      databaseURL: "https://dump-money-cfd01-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "dump-money-cfd01",
+      storageBucket: "dump-money-cfd01.appspot.com",
+      messagingSenderId: "589708288715",
+      appId: "1:589708288715:web:1031ab4eb2a767bf92314e",
+      measurementId: "G-8JPWPL06C0"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    let currentSalesman = null;
+    let selectedCustomer = null;
+    let customerCart = [];
+    let html5QrCode = null;
+    let isLogin = true;
+
+    const pages = document.querySelectorAll('.page');
+    const showPage = (pageId) => pages.forEach(p => p.classList.toggle('active', p.id === pageId));
+    
+    onAuthStateChanged(auth, async (user) => {
+        try {
+            if (user) {
+                const q = query(collection(db, "salesmen"), where("email", "==", user.email));
+                const querySnapshot = await getDocs(q);
+                
+                if (!querySnapshot.empty) {
+                    currentSalesman = { id: querySnapshot.docs[0].id, ...querySnapshot.docs[0].data() };
+                    document.getElementById('salesman-welcome-header').textContent = `Panel for ${currentSalesman.shopName}`;
+                    showPage('salesman-dashboard-page');
+                } else {
+                    await signOut(auth); // Sign out if no matching salesman doc is found
+                }
+            } else {
+                currentSalesman = null;
+                showPage('auth-page');
+            }
+        } catch (error) {
+            console.error("Critical error during auth state change:", error);
+            if (auth.currentUser) {
+                await signOut(auth).catch(e => console.error("Sign out failed:", e));
+            }
+            showPage('auth-page');
+        }
+    });
+    
+    document.getElementById('salesman-logout-button').addEventListener('click', () => signOut(auth));
+
+    const authForm = document.getElementById('auth-form');
+    const authToggleLink = document.getElementById('auth-toggle-link');
+
+    const toggleAuthMode = () => {
+        isLogin = !isLogin;
+        const errorEl = document.getElementById('auth-error');
+        errorEl.style.display = 'none';
+        authForm.reset();
+
+        document.getElementById('auth-title').textContent = isLogin ? 'Salesman Login' : 'Create Your Account';
+        document.getElementById('auth-subtitle').textContent = isLogin ? 'Sign in to your dashboard.' : 'Set a password for the email registered by your admin.';
+        document.getElementById('auth-button').textContent = isLogin ? 'Sign In' : 'Create Account';
+        document.getElementById('auth-toggle-text').textContent = isLogin ? "First time here? " : "Already have an account? ";
+        authToggleLink.textContent = isLogin ? 'Create Account' : 'Sign In';
+    };
+
+    authToggleLink.addEventListener('click', toggleAuthMode);
+
+    authForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = e.target.email.value;
+        const password = e.target.password.value;
+        const errorEl = document.getElementById('auth-error');
+        const submitBtn = document.getElementById('auth-button');
+        errorEl.style.display = 'none';
+        submitBtn.disabled = true;
+
+        try {
+            if (isLogin) {
+                await signInWithEmailAndPassword(auth, email, password);
+            } else { // Signup logic
+                const q = query(collection(db, "salesmen"), where("email", "==", email));
+                const snapshot = await getDocs(q);
+                if (snapshot.empty) {
+                    throw new Error("Your email is not registered by an admin.");
+                }
+                
+                const salesmanDoc = snapshot.docs[0];
+                if (salesmanDoc.data().authUid) {
+                    throw new Error("This account has already been created. Please log in instead.");
+                }
+
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                
+                await updateDoc(doc(db, "salesmen", salesmanDoc.id), {
+                    authUid: userCredential.user.uid
+                });
+            }
+        } catch (error) {
+            errorEl.textContent = error.message;
+            errorEl.style.display = 'block';
+        } finally {
+            submitBtn.disabled = false;
+        }
+    });
+
+    // --- Role Switching ---
+    const roleCards = document.querySelectorAll('.role-card');
+    const modeContents = document.querySelectorAll('.mode-content');
+    roleCards.forEach(card => {
+        card.addEventListener('click', () => {
+            roleCards.forEach(rc => rc.classList.remove('active'));
+            card.classList.add('active');
+            const targetMode = card.id === 'role-verify' ? 'verify-mode' : 'assist-mode';
+            modeContents.forEach(mc => mc.classList.toggle('active', mc.id === targetMode));
+        });
+    });
+
+    // --- VERIFY MODE ---
+    document.getElementById('verify-order-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const orderId = document.getElementById('txn-id-input').value.trim();
+        if (!orderId || !currentSalesman) return;
+
+        const orderRef = doc(db, 'orders', orderId);
+        const orderSnap = await getDoc(orderRef);
+
+        if (orderSnap.exists()) {
+            const orderData = orderSnap.data();
+            if (orderData.shopId !== currentSalesman.shopId) {
+                alert("This order does not belong to your shop.");
+                return;
+            }
+            displayTransactionDetails(orderData, orderId);
+        } else {
+            alert("Order not found!");
+        }
+    });
+    
+    function displayTransactionDetails(orderData, orderId) {
+        document.getElementById('verify-order-form').style.display = 'none';
+        const detailsContainer = document.getElementById('transaction-details');
+        detailsContainer.style.display = 'block';
+        document.getElementById('reset-verify-button').style.display = 'block';
+
+        let itemsHtml = orderData.items.map(item => `<li>${item.name} (x${item.quantity}) <span>₹${(item.price * item.quantity).toFixed(2)}</span></li>`).join('');
+        const isCompleted = orderData.status === 'Completed';
+
+        detailsContainer.innerHTML = `
+            <h3>Order Details</h3>
+            <p><strong>Customer:</strong> ${orderData.customerName}</p>
+            <p><strong>Total:</strong> ₹${orderData.total.toFixed(2)}</p>
+            <p><strong>Status:</strong> <span style="font-weight: bold; color: ${isCompleted ? 'var(--success-color)' : 'var(--warning-color)'};">${orderData.status}</span></p>
+            <h4>Items:</h4>
+            <ul>${itemsHtml}</ul>
+            ${isCompleted ? '' : '<button id="complete-order" class="btn btn-primary" style="margin-top: 1rem;">Confirm Handover</button>'}
+        `;
+
+        if (!isCompleted) {
+            document.getElementById('complete-order').addEventListener('click', async () => {
+                const completeBtn = document.getElementById('complete-order');
+                completeBtn.disabled = true;
+                completeBtn.textContent = 'Processing...';
+                await updateDoc(doc(db, 'orders', orderId), { status: 'Completed' });
+                alert('Order marked as completed!');
+                displayTransactionDetails({ ...orderData, status: 'Completed' }, orderId);
+            });
+        }
+    }
+    
+    document.getElementById('reset-verify-button').addEventListener('click', () => {
+        document.getElementById('verify-order-form').style.display = 'block';
+        document.getElementById('transaction-details').style.display = 'none';
+        document.getElementById('transaction-details').innerHTML = '';
+        document.getElementById('reset-verify-button').style.display = 'none';
+        document.getElementById('verify-order-form').reset();
+    });
+
+    // --- ASSIST MODE ---
+    document.getElementById('customer-search-form').addEventListener('submit', async e => {
+        e.preventDefault();
+        const searchTerm = document.getElementById('customer-search-input').value.trim();
+        const resultsEl = document.getElementById('customer-search-results');
+        resultsEl.innerHTML = '<p>Searching...</p>';
+
+        const emailQuery = query(collection(db, 'customers'), where('email', '==', searchTerm));
+        const mobileQuery = query(collection(db, 'customers'), where('mobile', '==', searchTerm));
+
+        const [emailSnap, mobileSnap] = await Promise.all([getDocs(emailQuery), getDocs(mobileQuery)]);
+        const results = new Map();
+        emailSnap.forEach(doc => results.set(doc.id, { id: doc.id, ...doc.data() }));
+        mobileSnap.forEach(doc => results.set(doc.id, { id: doc.id, ...doc.data() }));
+
+        if (results.size === 0) {
+            resultsEl.innerHTML = '<p>No customer found.</p>';
+        } else {
+            resultsEl.innerHTML = Array.from(results.values()).map(cust => `
+                <div class="result-item" data-id="${cust.id}">
+                    <strong>${cust.name}</strong><br>
+                    <small>${cust.email}</small>
+                </div>
+            `).join('');
+        }
+    });
+
+    document.getElementById('customer-search-results').addEventListener('click', async e => {
+        const item = e.target.closest('.result-item');
+        if (item) {
+            const customerId = item.dataset.id;
+            const custDoc = await getDoc(doc(db, 'customers', customerId));
+            if (custDoc.exists()) {
+                selectedCustomer = { id: custDoc.id, ...custDoc.data() };
+                startAssistSession();
+            }
+        }
+    });
+    
+    const startAssistSession = () => {
+        document.getElementById('customer-search-step').style.display = 'none';
+        document.getElementById('shopping-step').style.display = 'block';
+        document.getElementById('assist-header').innerHTML = `
+            <div><strong>Assisting:</strong> ${selectedCustomer.name}</div>
+            <div><strong>Wallet:</strong> ₹${selectedCustomer.wallet.toFixed(2)}</div>
+        `;
+        updateCartUI();
+    };
+
+    const endAssistSession = () => {
+        selectedCustomer = null;
+        customerCart = [];
+        document.getElementById('shopping-step').style.display = 'none';
+        document.getElementById('customer-search-step').style.display = 'block';
+        document.getElementById('customer-search-form').reset();
+        document.getElementById('customer-search-results').innerHTML = '';
+    };
+    document.getElementById('end-assist-session').addEventListener('click', endAssistSession);
+    
+    const updateCartUI = () => {
+        const itemsEl = document.getElementById('cart-items');
+        const summaryEl = document.getElementById('cart-summary');
+        if (customerCart.length === 0) {
+            itemsEl.innerHTML = '<p style="color: var(--text-light); text-align:center; padding: 1rem 0;">Cart is empty. Scan a product to start.</p>';
+            summaryEl.innerHTML = '';
+            return;
+        }
+
+        itemsEl.innerHTML = customerCart.map(item => `
+            <div class="cart-item">
+                <span>${item.name} (x${item.quantity})</span>
+                <span>₹${(item.finalPrice * item.quantity).toFixed(2)}</span>
+            </div>
+        `).join('');
+
+        const total = customerCart.reduce((sum, item) => sum + (item.finalPrice * item.quantity), 0);
+        summaryEl.innerHTML = `
+            <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.2rem;">
+                <span>Total</span>
+                <span>₹${total.toFixed(2)}</span>
+            </div>
+            <button id="checkout-btn" class="btn btn-success" style="width: 100%; margin-top: 1rem;">Checkout for Customer</button>
+        `;
+    };
+
+    document.getElementById('cart-summary').addEventListener('click', e => {
+        if (e.target.id === 'checkout-btn') {
+            handleCheckout();
+        }
+    });
+    
+    const handleScannedProduct = async (productId) => {
+        const stockRef = doc(db, 'stock', productId);
+        const stockSnap = await getDoc(stockRef);
+        if (!stockSnap.exists() || stockSnap.data().shopId !== currentSalesman.shopId) {
+            alert('Product not found or not available in this shop.');
+            return;
+        }
+        
+        const product = { id: stockSnap.id, ...stockSnap.data() };
+        const finalPrice = product.price - (product.discount || 0);
+
+        const existingItem = customerCart.find(item => item.id === product.id);
+        if (existingItem) {
+            if (existingItem.quantity < product.quantity) {
+                existingItem.quantity++;
+            } else { alert('Max stock reached for this item.'); }
+        } else {
+             if (product.quantity > 0) {
+                customerCart.push({ ...product, quantity: 1, finalPrice });
+            } else { alert('Item is out of stock.'); }
+        }
+        updateCartUI();
+    };
+
+    const handleCheckout = async () => {
+        const total = customerCart.reduce((sum, item) => sum + (item.finalPrice * item.quantity), 0);
+        if (total === 0) return alert('Cart is empty.');
+        
+        const checkoutBtn = document.getElementById('checkout-btn');
+        checkoutBtn.disabled = true;
+        checkoutBtn.textContent = 'Processing...';
+
+        try {
+            await runTransaction(db, async (transaction) => {
+                const customerRef = doc(db, 'customers', selectedCustomer.id);
+                const customerDoc = await transaction.get(customerRef);
+                const currentWallet = customerDoc.data().wallet;
+
+                if (currentWallet < total) throw new Error("Customer has insufficient funds.");
+
+                for (const item of customerCart) {
+                    const stockRef = doc(db, 'stock', item.id);
+                    const stockDoc = await transaction.get(stockRef);
+                    if (!stockDoc.exists() || stockDoc.data().quantity < item.quantity) {
+                        throw new Error(`Item "${item.name}" is out of stock.`);
+                    }
+                    const newQuantity = stockDoc.data().quantity - item.quantity;
+                    transaction.update(stockRef, { quantity: newQuantity });
+                }
+
+                transaction.update(customerRef, { wallet: currentWallet - total });
+                
+                const orderRef = doc(collection(db, 'orders'));
+                transaction.set(orderRef, {
+                    customerId: selectedCustomer.id,
+                    customerName: selectedCustomer.name,
+                    items: customerCart.map(i => ({ id: i.id, name: i.name, price: i.finalPrice, quantity: i.quantity })),
+                    total,
+                    shopId: currentSalesman.shopId,
+                    status: 'Paid',
+                    createdAt: serverTimestamp(),
+                    assistedBy: currentSalesman.id,
+                    salesmanName: currentSalesman.name
+                });
+            });
+            alert('Checkout successful!');
+            endAssistSession();
+        } catch (error) {
+            alert(`Checkout failed: ${error.message}`);
+        } finally {
+            checkoutBtn.disabled = false;
+            checkoutBtn.textContent = 'Checkout for Customer';
+        }
+    };
+
+    // --- QR SCANNER ---
+    const scanModal = document.getElementById('scan-modal');
+    const onScanSuccess = (decodedText, decodedResult) => {
+        if (html5QrCode && html5QrCode.isScanning) {
+            html5QrCode.stop().then(ignore => {
+                scanModal.classList.remove('active');
+                handleScannedProduct(decodedText);
+            }).catch(err => console.error("Failed to stop scanner", err));
+        }
+    };
+    
+    document.getElementById('scan-product-btn').addEventListener('click', () => {
+        if (!html5QrCode) {
+            html5QrCode = new Html5Qrcode("qr-reader");
+        }
+        scanModal.classList.add('active');
+        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+        html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess, (errorMessage) => {});
+    });
+
+    document.getElementById('close-scan-modal').addEventListener('click', () => {
+        if (html5QrCode && html5QrCode.isScanning) {
+            html5QrCode.stop().catch(err => {});
+        }
+        scanModal.classList.remove('active');
+    });
+
+</script>
+
+<script src="./script.js"></script></body></html>
